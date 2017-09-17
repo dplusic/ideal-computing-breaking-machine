@@ -1,0 +1,18 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nanoid": "^0.2.1",
+    "nodejs-websocket": "^1.7.1",
+    "socket.io": "^2.0.3",
+    "webstomp-client": "^1.0.7"
+  }
+}
