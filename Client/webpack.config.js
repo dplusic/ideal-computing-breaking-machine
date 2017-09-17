@@ -25,6 +25,11 @@ module.exports = function() {
         module: {
             loaders: [
                 { test: /\.tsx?$/, exclude: /^\.#/, loader: 'ts-loader' },
+                {
+                    // Load imported stylesheets
+                    test: /\.s?css$/,
+                    loaders: ['style-loader', 'css-loader']
+                }
             ]
         },
         plugins: [

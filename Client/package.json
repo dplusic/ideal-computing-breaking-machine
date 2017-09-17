@@ -26,6 +26,7 @@
     "@types/lodash": "^4.14.74",
     "@types/pixi.js": "^4.5.3",
     "@types/socket.io-client": "^1.4.30",
+    "style-loader": "^0.18.2",
     "ts-loader": "^2.3.7",
     "typescript": "^2.5.2",
     "webpack": "^3.6.0",
@@ -34,11 +35,13 @@
   },
   "dependencies": {
     "box2d": "^1.0.0",
+    "css-loader": "^0.28.7",
     "lodash": "^4.17.4",
     "pixi-rescale": "^1.0.0",
     "pixi-spine": "^1.5.5",
     "pixi.js": "^4.5.5",
     "socket.io": "^2.0.3",
-    "socket.io-client": "^2.0.3"
+    "socket.io-client": "^2.0.3",
+    "sweetalert2": "^6.9.0"
   }
 }

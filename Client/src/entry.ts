@@ -2,6 +2,8 @@ import PIXI = require("pixi.js");
 import "pixi-spine";
 import Rescale from "pixi-rescale";
 import _ = require('lodash');
+import swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.css';
 import io = require('socket.io-client');
 import { RESOURCE_CONFIG_URL } from "webpack-game-asset-plugin/helper";
 import GOBLIN_ATLAS from "game-asset!assets/goblins_atlas.atlas";
@@ -46,7 +48,7 @@ load().then(main);
 
 const resources = PIXI.loader.resources;
 
-function addGoblin() {
+function addGoblin(name: string) {
     const spineAtlas = new PIXI.spine.core.TextureAtlas(resources[GOBLIN_ATLAS].data, (__, cb) => cb(PIXI.BaseTexture.from(GOBLIN_IMAGE)));
     const spineAtlasLoader = new PIXI.spine.core.AtlasAttachmentLoader(spineAtlas);
     const spineJsonParser = new PIXI.spine.core.SkeletonJson(spineAtlasLoader);
@@ -56,6 +58,12 @@ function addGoblin() {
     goblin.position.set(app.renderer.width / 2, app.renderer.height / 2);
     goblin.autoUpdate = true;
     app.stage.addChild(goblin);
+
+    const text = new PIXI.Text(name, {fontFamily : 'Arial', fontSize: 24, fill : 0xffffff, align : 'center'});
+    text.anchor.set(0.5);
+    text.y = -300;
+    goblin.addChild(text);
+
     return goblin;
 }
 
@@ -73,11 +81,11 @@ function syncGoblin(goblin: PIXI.spine.Spine, pos: {x: number, y: number}, bones
 
 const otherGoblins: { [key:string]:PIXI.spine.Spine; } = {};
 
-function getOtherGoblin(id: string) {
+function getOtherGoblin(id: string, user: {name: string}) {
     if (id in otherGoblins) {
         return otherGoblins[id];
     } else {
-        const goblin = addGoblin();
+        const goblin = addGoblin(user.name);
         otherGoblins[id] = goblin;
         return goblin;
     }
@@ -87,37 +95,50 @@ function removeOtherGoblin(id: string) {
     delete otherGoblins[id];
 }
 
-function connect(goblin: PIXI.spine.Spine) {
+function connect(name: string, goblin: PIXI.spine.Spine) {
     const socket = io('http://192.168.0.111');
 
-    socket.on('login', (id: string) => {
+    socket.emit('login', name);
+
+    socket.on('login done', () => {
         app.ticker.add(dt => {
             const pos = {x: goblin.x, y: goblin.y};
             const bones = goblin.skeleton.slots.map(x => ({x: x.bone.x, y: x.bone.y, rotation: x.bone.rotation}));
 
-            socket.emit('update bone', id, pos, bones);
+            socket.emit('update bone', pos, bones);
         });
     });
 
-    socket.on('sync bone', (id: string, pos: {x: number, y: number}, bones: Array<{x: number, y: number, rotation: number}>) => {
-        const goblin = getOtherGoblin(id);
+    socket.on('sync bone', (id: string, user: {name: string}, pos: {x: number, y: number}, bones: Array<{x: number, y: number, rotation: number}>) => {
+        const goblin = getOtherGoblin(id, user);
         syncGoblin(goblin, pos, bones);
     });
 
-    socket.on('dismiss', (id: string) => {
-        const goblin = getOtherGoblin(id);
+    socket.on('dismiss', (id: string, user: {name: string}) => {
+        const goblin = getOtherGoblin(id, user);
         app.stage.removeChild(goblin);
         removeOtherGoblin(id);
     });
 }
 
+function getName() {
+    return swal({
+        title: 'Submit your name',
+        input: 'text',
+        confirmButtonText: 'Submit',
+        allowOutsideClick: false,
+    });
+}
+
 async function main() {
-    const goblin = addGoblin();
+    const name = await getName();
+
+    const goblin = addGoblin(name);
 
     goblin.state.setAnimation(0, 'walk', true);
     goblin.x = _.random(0, 1000);
 
     (window as any).goblin = goblin;
 
-    connect(goblin);
+    connect(name, goblin);
 }
