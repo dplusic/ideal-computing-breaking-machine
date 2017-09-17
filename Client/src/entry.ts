@@ -14,6 +14,7 @@ const app = new PIXI.Application({
     width: 1334,
     height: 750
 });
+const wrap = new PIXI.Container();
 
 Rescale(app.renderer);
 
@@ -55,7 +56,7 @@ function addGoblin(name: string) {
     const spineData = spineJsonParser.readSkeletonData(PIXI.loader.resources[GOBLIN_SPINE].data);
     const goblin = new PIXI.spine.Spine(spineData);
     goblin.skeleton.setSkinByName('goblin');
-    goblin.position.set(app.renderer.width / 2, app.renderer.height / 2);
+    goblin.position.set(app.renderer.width / 2, app.renderer.height - 40);
     goblin.autoUpdate = true;
     app.stage.addChild(goblin);
 
@@ -81,13 +82,17 @@ function syncGoblin(goblin: PIXI.spine.Spine, pos: {x: number, y: number}, bones
 
 const otherGoblins: { [key:string]:PIXI.spine.Spine; } = {};
 
-function getOtherGoblin(id: string, user: {name: string}) {
+function getOtherGoblin(id: string, user?: {name: string}) {
     if (id in otherGoblins) {
         return otherGoblins[id];
     } else {
-        const goblin = addGoblin(user.name);
-        otherGoblins[id] = goblin;
-        return goblin;
+        if (user !== undefined) {
+            const goblin = addGoblin(user.name);
+            otherGoblins[id] = goblin;
+            return goblin;
+        } else {
+            throw new Error("WTF");
+        }
     }
 }
 
@@ -101,6 +106,15 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
     socket.emit('login', name);
 
     socket.on('login done', () => {
+        window.addEventListener("keypress", (e: KeyboardEvent) => {
+            if (e.charCode !== 32) {
+                return;
+            }
+
+            goblin.position.x += 10;
+            app.stage.position.x -= 10;
+        });
+
         app.ticker.add(dt => {
             const pos = {x: goblin.x, y: goblin.y};
             const bones = goblin.skeleton.slots.map(x => ({x: x.bone.x, y: x.bone.y, rotation: x.bone.rotation}));
@@ -115,7 +129,7 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
     });
 
     socket.on('dismiss', (id: string, user: {name: string}) => {
-        const goblin = getOtherGoblin(id, user);
+        const goblin = getOtherGoblin(id);
         app.stage.removeChild(goblin);
         removeOtherGoblin(id);
     });
@@ -136,7 +150,7 @@ async function main() {
     const goblin = addGoblin(name);
 
     goblin.state.setAnimation(0, 'walk', true);
-    goblin.x = _.random(0, 1000);
+    goblin.x = app.renderer.width / 2;
 
     (window as any).goblin = goblin;
 
