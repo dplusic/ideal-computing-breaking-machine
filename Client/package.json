@@ -1,0 +1,39 @@
+{
+  "name": "ideal-computing-breaking-machine-client",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dplusic/ideal-computing-breaking-machine.git"
+  },
+  "keywords": [
+    "icbm",
+    "racing",
+    "qwop"
+  ],
+  "author": "TeamICBM",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/dplusic/ideal-computing-breaking-machine/issues"
+  },
+  "homepage": "https://github.com/dplusic/ideal-computing-breaking-machine#readme",
+  "devDependencies": {
+    "@types/lodash": "^4.14.74",
+    "@types/pixi.js": "^4.5.3",
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.5.2",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.8.2",
+    "webpack-game-asset-plugin": "^0.13.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "pixi-rescale": "^1.0.0",
+    "pixi-spine": "^1.5.5",
+    "pixi.js": "^4.5.5"
+  }
+}
