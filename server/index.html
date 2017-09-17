@@ -1,13 +1,13 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var id;
+    var myId;
 
     var socket = io('http://localhost');
-    socket.on('login', function (data) {
-        id = data.id;
+    socket.on('login', function (id) {
+        myId = id;
 
-        socket.on('sync bone', function (data) {
-            console.log(data);
+        socket.on('sync bone', function (id, frameNo) {
+            console.log(id, frameNo);
         });
 
         startLoop();
@@ -15,8 +15,8 @@
 
     var frameNo = 0;
     function onUpdate() {
-        console.log(id + ' ' + frameNo++);
-        socket.emit('update bone', { id: id, frameNo: frameNo });
+        console.log('>>> ' + myId + ' ' + frameNo++);
+        socket.emit('update bone', myId, frameNo);
     }
 
     var interval = 1000 / 60;
