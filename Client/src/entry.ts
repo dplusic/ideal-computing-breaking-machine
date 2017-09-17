@@ -105,14 +105,30 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
 
     socket.emit('login', name);
 
+    const button = new PIXI.Graphics();
+    button.beginFill(0xFFFFFF);
+    button.drawRoundedRect(-50, -50, 100, 100, 10);
+    button.position.set(120, app.renderer.height - 70);
+    app.stage.addChild(button);
+
+    const button1 = new PIXI.Graphics();
+    button1.beginFill(0xFFFFFF);
+    button1.drawRoundedRect(-50, -50, 100, 100, 10);
+    button1.position.set(app.renderer.width - 120, app.renderer.height - 70);
+    app.stage.addChild(button1);
+
     socket.on('login done', () => {
+        button.interactive = true;
+        button1.interactive = true;
+        button.on("pointertap", move);
+        button1.on("pointertap", move);
+        
         window.addEventListener("keypress", (e: KeyboardEvent) => {
             if (e.charCode !== 32) {
                 return;
             }
 
-            goblin.position.x += 10;
-            app.stage.position.x -= 10;
+            move();
         });
 
         app.ticker.add(dt => {
@@ -133,6 +149,13 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
         app.stage.removeChild(goblin);
         removeOtherGoblin(id);
     });
+
+    function move() {
+        goblin.position.x += 10;
+        button.position.x += 10;
+        button1.position.x += 10;
+        app.stage.position.x -= 10;
+    }
 }
 
 function getName() {
