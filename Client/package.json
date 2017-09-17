@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/dplusic/ideal-computing-breaking-machine#readme",
   "devDependencies": {
+    "@types/box2d": "0.0.32",
     "@types/lodash": "^4.14.74",
     "@types/pixi.js": "^4.5.3",
     "ts-loader": "^2.3.7",
@@ -31,6 +32,7 @@
     "webpack-game-asset-plugin": "^0.13.0"
   },
   "dependencies": {
+    "box2d": "^1.0.0",
     "lodash": "^4.17.4",
     "pixi-rescale": "^1.0.0",
     "pixi-spine": "^1.5.5",
