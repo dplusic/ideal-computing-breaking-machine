@@ -19,9 +19,15 @@ function handler (req, res) {
 }
 
 io.on('connection', function (socket) {
-    socket.emit('login', nanoid());
+    const id = nanoid();
+
+    socket.emit('login', id);
 
     socket.on('update bone', function () {
         socket.broadcast.emit('sync bone', ...arguments);
+    });
+
+    socket.on('disconnect', function() {
+        socket.broadcast.emit('dismiss', id);
     });
 });

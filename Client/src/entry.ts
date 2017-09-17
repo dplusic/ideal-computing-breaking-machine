@@ -83,6 +83,10 @@ function getOtherGoblin(id: string) {
     }
 }
 
+function removeOtherGoblin(id: string) {
+    delete otherGoblins[id];
+}
+
 function connect(goblin: PIXI.spine.Spine) {
     const socket = io('http://192.168.0.111');
 
@@ -98,6 +102,12 @@ function connect(goblin: PIXI.spine.Spine) {
     socket.on('sync bone', (id: string, pos: {x: number, y: number}, bones: Array<{x: number, y: number, rotation: number}>) => {
         const goblin = getOtherGoblin(id);
         syncGoblin(goblin, pos, bones);
+    });
+
+    socket.on('dismiss', (id: string) => {
+        const goblin = getOtherGoblin(id);
+        app.stage.removeChild(goblin);
+        removeOtherGoblin(id);
     });
 }
 
