@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo '##########'
 echo '## ICBM ##'
 echo '##########'
