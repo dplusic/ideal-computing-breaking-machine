@@ -126,7 +126,7 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
         button.on("pointertap", move);
         button1.on("pointertap", move);
         
-        window.addEventListener("keypress", (e: KeyboardEvent) => {
+        window.addEventListener("keyup", (e: KeyboardEvent) => {
             if (e.charCode !== 32) {
                 return;
             }
