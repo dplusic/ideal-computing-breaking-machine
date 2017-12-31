@@ -127,11 +127,10 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
         button1.on("pointertap", move);
         
         window.addEventListener("keyup", (e: KeyboardEvent) => {
-            if (e.charCode !== 32) {
-                return;
+            if (e.key === 'ArrowRight' ||
+                e.key === 'ArrowLeft') {
+                move();
             }
-
-            move();
         });
 
         app.ticker.add(dt => {
