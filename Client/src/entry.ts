@@ -67,6 +67,13 @@ function addGoblin(name: string) {
     goblin.addChild(text);
 
     goblin.state.setAnimation(0, 'walk', true);
+    goblin.state.addListener({
+        complete: track => {
+            if (track.animation.name === 'shoot') {
+                goblin.state.setAnimation(0, 'walk', true);
+            }
+        }
+    });
 
     return goblin;
 }
@@ -120,7 +127,9 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
     button1.position.set(app.renderer.width - 120, app.renderer.height - 70);
     app.stage.addChild(button1);
 
-    socket.on('login done', () => {
+    let alive = true;
+
+    socket.on('login done', (myId: string, user: {name: string}) => {
         button.interactive = true;
         button1.interactive = true;
         button.on("pointertap", move);
@@ -130,6 +139,8 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
             if (e.key === 'ArrowRight' ||
                 e.key === 'ArrowLeft') {
                 move();
+            } else if (['1', '2', '3', '4', '5', '6', '7', '8', '9'].indexOf(e.key) !== -1) {
+                attack(parseInt(e.key) - 1);
             }
         });
 
@@ -138,6 +149,19 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
             const bones = goblin.skeleton.slots.map(x => ({x: x.bone.x, y: x.bone.y, rotation: x.bone.rotation}));
 
             socket.emit('update bone', pos, bones);
+        });
+
+        socket.on('attack', (id: string, user: {name: string}, targetId: string) => {
+            if (targetId === myId) {
+                goblin.state.setAnimation(0, 'death', false);
+                alive = false;
+
+                // TODO revive
+
+            } else {
+                const otherGoblin = getOtherGoblin(targetId, user);
+                otherGoblin.state.setAnimation(0, 'death', false);
+            }
         });
     });
 
@@ -153,10 +177,39 @@ function connect(name: string, goblin: PIXI.spine.Spine) {
     });
 
     function move() {
+        if (!alive) {
+            return;
+        }
+
         goblin.position.x += 10;
         button.position.x += 10;
         button1.position.x += 10;
         app.stage.position.x -= 10;
+    }
+
+    function attack(index: number) {
+        if (!alive) {
+            return;
+        }
+        // TODO cooltime
+
+        goblin.state.setAnimation(0, 'shoot', false);
+
+        const otherGoblinsArray = Object.keys(otherGoblins)
+            .map((key) => {
+                return {key, spine: otherGoblins[key]};
+            })
+            .filter(x => x.spine.x > goblin.x)
+            .sort((a, b) => {
+                return a.spine.x - b.spine.x;
+            });
+
+        const targetGoblin = otherGoblinsArray[index];
+        if (!targetGoblin) {
+            return;
+        }
+
+        socket.emit('attack', targetGoblin.key);
     }
 }
 

@@ -38,6 +38,10 @@ io.on('connection', function (socket) {
         socket.broadcast.emit('sync bone', _id, _user, ...arguments);
     });
 
+    socket.on('attack', function () {
+        io.emit('attack', _id, _user, ...arguments);
+    });
+
     socket.on('disconnect', function() {
         socket.broadcast.emit('dismiss', _id, _user);
     });
