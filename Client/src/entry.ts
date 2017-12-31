@@ -6,9 +6,9 @@ import swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.css';
 import io = require('socket.io-client');
 import { RESOURCE_CONFIG_URL } from "webpack-game-asset-plugin/helper";
-import GOBLIN_ATLAS from "game-asset!assets/goblins_atlas.atlas";
-import GOBLIN_IMAGE from "game-asset!assets/goblins_img.png";
-import GOBLIN_SPINE from "game-asset!assets/goblins.json";
+import GOBLIN_ATLAS from "game-asset!assets/spineboy_atlas.atlas";
+import GOBLIN_IMAGE from "game-asset!assets/spineboy_img.png";
+import GOBLIN_SPINE from "game-asset!assets/spineboy.json";
 
 const app = new PIXI.Application({
     width: 1334,
@@ -55,15 +55,18 @@ function addGoblin(name: string) {
     const spineJsonParser = new PIXI.spine.core.SkeletonJson(spineAtlasLoader);
     const spineData = spineJsonParser.readSkeletonData(PIXI.loader.resources[GOBLIN_SPINE].data);
     const goblin = new PIXI.spine.Spine(spineData);
-    goblin.skeleton.setSkinByName('goblin');
+    goblin.skeleton.setSkinByName('default');
     goblin.position.set(app.renderer.width / 2, app.renderer.height - 40);
+    goblin.scale.x = goblin.scale.y = 0.5;
     goblin.autoUpdate = true;
     app.stage.addChild(goblin);
 
-    const text = new PIXI.Text(name, {fontFamily : 'Arial', fontSize: 24, fill : 0xffffff, align : 'center'});
+    const text = new PIXI.Text(name, {fontFamily : 'Arial', fontSize: 50, fill : 0xffffff, align : 'center'});
     text.anchor.set(0.5);
-    text.y = -300;
+    text.y = -750;
     goblin.addChild(text);
+
+    goblin.state.setAnimation(0, 'walk', true);
 
     return goblin;
 }
@@ -172,7 +175,6 @@ async function main() {
 
     const goblin = addGoblin(name);
 
-    goblin.state.setAnimation(0, 'walk', true);
     goblin.x = app.renderer.width / 2;
 
     (window as any).goblin = goblin;
