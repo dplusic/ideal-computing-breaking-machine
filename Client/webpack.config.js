@@ -1,6 +1,7 @@
 const path = require('path');
 const types = require("mime-types").types;
 const wgap = require('webpack-game-asset-plugin').default;
+const webpack = require('webpack');
 
 types["atlas"] = "text";
 
@@ -42,7 +43,8 @@ module.exports = function() {
                 compositor: "gm",
                 entryOption: "entry.json",
                 collectAll: false
-            })
+            }),
+            new webpack.EnvironmentPlugin(['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_REGION', 'AWS_GAMELIFT_FLEET_ID']),
         ]
     };
 };

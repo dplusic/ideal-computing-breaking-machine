@@ -10,8 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@dplusic/gamelift-nodejs-serversdk": "0.0.1",
+    "exit-hook": "^2.0.0",
     "nanoid": "^0.2.1",
     "nodejs-websocket": "^1.7.1",
+    "portastic": "^1.0.1",
     "socket.io": "^2.0.3",
     "webstomp-client": "^1.0.7"
   }

@@ -4,11 +4,13 @@ import Rescale from "pixi-rescale";
 import _ = require('lodash');
 import swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.css';
-import io = require('socket.io-client');
 import { RESOURCE_CONFIG_URL } from "webpack-game-asset-plugin/helper";
 import GOBLIN_ATLAS from "game-asset!assets/spineboy_atlas.atlas";
 import GOBLIN_IMAGE from "game-asset!assets/spineboy_img.png";
 import GOBLIN_SPINE from "game-asset!assets/spineboy.json";
+import { setupGameLift } from "./gamelift";
+import { SessionInfo } from "./SessionInfo";
+import { connectAndLogin } from "./network";
 
 const app = new PIXI.Application({
     width: 1334,
@@ -110,10 +112,8 @@ function removeOtherGoblin(id: string) {
     delete otherGoblins[id];
 }
 
-function connect(name: string, goblin: PIXI.spine.Spine) {
-    const socket = io('http://192.168.0.111');
-
-    socket.emit('login', name);
+function connect(sessionInfo: SessionInfo, name: string, goblin: PIXI.spine.Spine) {
+    const socket = connectAndLogin(sessionInfo, name);
 
     const button = new PIXI.Graphics();
     button.beginFill(0xFFFFFF);
@@ -231,5 +231,7 @@ async function main() {
 
     (window as any).goblin = goblin;
 
-    connect(name, goblin);
+    const sessionInfo = await setupGameLift();
+
+    connect(sessionInfo, name, goblin);
 }
