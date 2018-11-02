@@ -4,9 +4,7 @@ import { SessionInfo } from './SessionInfo';
 
 (async () => {
     try {
-        const sessionInfo: SessionInfo = await setupGameLift({
-            // endpoint: 'http://localhost:8080',
-        });
+        const sessionInfo: SessionInfo = await setupGameLift();
 
         console.log(sessionInfo);
 

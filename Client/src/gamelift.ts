@@ -3,17 +3,13 @@ import { promisify } from 'es6-promisify';
 import uuid = require('uuid');
 import delay = require('delay');
 
-export interface GameLiftSetupParam {
-    endpoint?: string
-}
-
-export const setupGameLift = async (param: GameLiftSetupParam = {}) => {
+export const setupGameLift = async () => {
     AWS.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
     AWS.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
     AWS.config.region = process.env.AWS_REGION;
 
     const gameLift = new AWS.GameLift({
-        endpoint: param.endpoint,
+        endpoint: process.env.AWS_GAMELIFT_ENDPOINT,
     });
 
     const { GameSessions: gameSessions } = await promisify(gameLift.describeGameSessions).bind(gameLift)({
@@ -23,7 +19,8 @@ export const setupGameLift = async (param: GameLiftSetupParam = {}) => {
 
     let gameSession = null;
     for (const each of gameSessions) {
-        if (each.CurrentPlayerSessionCount < each.MaximumPlayerSessionCount) {
+        if (each.CurrentPlayerSessionCount === undefined ||
+            each.CurrentPlayerSessionCount < each.MaximumPlayerSessionCount) {
             gameSession = each;
             break;
         }
